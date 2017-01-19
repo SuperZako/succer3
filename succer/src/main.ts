@@ -1,22 +1,5 @@
-﻿let canvas: HTMLCanvasElement;
-let context: CanvasRenderingContext2D;
-
-function _print(_str: string, _x: number, _y: number, _col: number) {
-
-}
-
-/* Imageオブジェクトを生成 */
-let img = new Image();
-img.src = "../img/sprite2.png";
-
-function spr(n: number, x: number, y: number, _w = 0, _h = 0, _flip_x = false, _flip_y = false) {
-    n = Math.round(n);
-    let col = n % 16;
-    let row = Math.floor(n / 16);
-    context.drawImage(img, col * 8, row * 8, 8, 8, x - offsetX, y - offsetY, 8, 8);
-}
-
-
+﻿/// <reference path="Renderer.ts" />
+/// <reference path="ThrowIn.ts" />
 
 function rnd(n: number) {
 
@@ -53,135 +36,6 @@ function pal(_c0 = 0, _c1 = 0, _p = 0) {
 }
 
 
-
-let offsetX = 0;
-
-let offsetY = 0;
-
-function camera(x = 0, y = 0) {
-
-    offsetX = x;
-
-    offsetY = y;
-
-}
-
-
-
-function palt(_col = 0, _t = false) { }
-
-
-
-function line(x0: number, y0: number, x1: number, y1: number, _col = 0) {
-
-    x0 -= offsetX;
-
-    x1 -= offsetX;
-
-    y0 -= offsetY;
-
-    y1 -= offsetY;
-
-    if (context) {
-        context.save();
-        //新しいパスを開始する
-        context.beginPath();
-        //パスの開始座標を指定する
-
-        context.moveTo(x0, y0);
-
-        //座標を指定してラインを引いていく
-
-        context.lineTo(x1, y1);
-
-
-
-        //パスを閉じる（最後の座標から開始座標に向けてラインを引く）
-
-        context.closePath();
-
-        //現在のパスを輪郭表示する
-
-        context.stroke();
-
-        context.restore();
-
-    }
-
-}
-
-
-
-function rect(x0 = 0, y0 = 0, x1 = 0, y1 = 0, _col = 0) {
-
-    x0 -= offsetX;
-
-    x1 -= offsetX;
-
-    y0 -= offsetY;
-
-    y1 -= offsetY;
-
-
-
-    if (context) {
-
-        context.save();
-
-
-
-        context.strokeRect(x0, y0, x1 - x0, y1 - y0);
-
-
-
-        context.restore();
-
-    }
-
-}
-
-
-
-function rectfill(x0 = 0, y0 = 0, x1 = 0, y1 = 0, col: number) {
-    x0 -= offsetX;
-    x1 -= offsetX;
-    y0 -= offsetY;
-    y1 -= offsetY;
-    if (context) {
-        context.save();
-        switch (col) {
-            case 3:
-                context.fillStyle = 'green';
-                break;
-
-            case 4:
-
-                context.fillStyle = 'red';
-
-                break;
-
-            case 6:
-
-                context.fillStyle = "gray";
-
-                break;
-
-            case 7:
-
-                context.fillStyle = 'white';
-
-                break;
-
-            default:
-
-                break;
-
-        }
-        context.fillRect(x0, y0, x1 - x0, y1 - y0);
-        context.restore();
-    }
-}
-function color(_col = 0) { }
 function circ(_x = 0, _y = 0, _r = 0, _col = 0) { }
 function music(_n = 0, _a = 0, _b = 0) { }
 
@@ -274,14 +128,6 @@ let man_with_ball;
 
 
 
-function print_outlined(t, x, y, c, oc) {
-    for (let i = x - 1; i < x + 1; ++i) {
-        for (let j = y - 1; j < y + 1; ++j) {
-            _print(t, i, j, oc)
-        }
-    }
-    _print(t, x, y, c)
-}
 
 
 function dist_manh(a, b) {
@@ -296,7 +142,7 @@ function draw_marker(f) {
     if (f.hasball)
         sp = 31
 
-    spr(sp, f.x - 4, f.y - 6)
+    Renderer.spr(sp, f.x - 4, f.y - 6)
 }
 
 
@@ -367,7 +213,7 @@ function draw_footballer(f) {
     }
 
     let pos = sprite_pos(f)
-    spr(animoffset + f.lastspr * animfactor + f.animtimer, pos.x, pos.y, 1, 1, f.lastflip)
+    Renderer.spr(animoffset + f.lastspr * animfactor + f.animtimer, pos.x, pos.y, 1, 1, f.lastflip)
 }
 
 
@@ -409,7 +255,7 @@ function create_footballer(p, i) {
         },
 
         drawshadow: function (t) {
-            spr(46, t.x - 2, t.y - 2)
+            Renderer.spr(46, t.x - 2, t.y - 2)
         },
 
         state: fstate_ok,
@@ -437,10 +283,10 @@ let ball = {
     // -- damp=0.95,
     dampair: 0.985,
     draw: function (b) {
-        spr(44, b.x - b.w, b.y - b.h - b.z);
+        Renderer.spr(44, b.x - b.w, b.y - b.h - b.z);
     },
     drawshadow: function (b) {
-        spr(45, b.x - b.w + 1, b.y - b.h + 1);
+        Renderer.spr(45, b.x - b.w + 1, b.y - b.h + 1);
     }
 };
 
@@ -895,24 +741,24 @@ let goal_up = {
         let clipstarty = -camtarget.y + 64 - fh2
         let clipendx = goalx2 - goalx1
         let clipendy = goalh / 2 + 1
-        spr(60, goalx2, -fh2 - 17)
+        Renderer.spr(60, goalx2, -fh2 - 17)
         clip(clipstartx, clipstarty - 10, clipendx + 8, clipendy)
         for (let x = goalx1 - 1; x < goalx2 + 8; x += 8) {
             for (let y = -11; y < 7; y += 8) {
-                spr(61, x, y - fh2)
+                Renderer.spr(61, x, y - fh2)
             }
         }
         clip(clipstartx, clipstarty - goalh, clipendx - 1, clipendy)
         for (let x = goalx1 - 1; x < goalx2 + 8; x += 8) {
             for (let y = -goalh + 1; y < 8; y += 8) {
-                spr(62, x, y - fh2)
+                Renderer.spr(62, x, y - fh2)
             }
         }
         clip();
         let a = -goall - fh2;
-        line(goalx1, a, goalx1, -fh2)
-        line(goalx1, a, goalx2, a)
-        line(goalx2, a, goalx2, -fh2)
+        Renderer.line(goalx1, a, goalx1, -fh2)
+        Renderer.line(goalx1, a, goalx2, a)
+        Renderer.line(goalx2, a, goalx2, -fh2)
     },
     drawshadow: nothing
 }
@@ -921,13 +767,13 @@ let goal_up = {
 let goal_down = {
     y: fh2 + goalh,
     draw: function (this) {
-        spr(60, goalx2, fh2, 1, 1, false, true);
-        color(7);
-        rect(goalx1, -goall + fh2, goalx2, fh2);
+        Renderer.spr(60, goalx2, fh2, 1, 1, false, true);
+        Renderer.color(7);
+        Renderer.rect(goalx1, -goall + fh2, goalx2, fh2);
         clip(goalx1 - camtarget.x + 64 + 1, -goall - camtarget.y + 64 + fh2 + 1, goalx2 - goalx1 - 1, goalh - 1);
         for (let x = goalx1; x <= goalx2 + 7; x += 8) {
             for (let y = -goall; y <= goall; y += 8) {
-                spr(62, x, y + fh2);
+                Renderer.spr(62, x, y + fh2);
             }
         }
         clip()
@@ -1041,7 +887,7 @@ function start_match(dem) {
 
 
 function print_mode(m, t) {
-    if (m == mode) print_outlined(t, 32 - menu_offset, 75, 6, 5)
+    if (m == mode) Renderer.print_outlined(t, 32 - menu_offset, 75, 6, 5)
 }
 
 
@@ -1063,7 +909,7 @@ let keeper_state_dive = {
     draw: function (k) {
         jersey_color(k)
         let pos = sprite_pos(k);
-        spr(k.lastspr, pos.x, pos.y, 1, 1, k.d.x < 0)
+        Renderer.spr(k.lastspr, pos.x, pos.y, 1, 1, k.d.x < 0)
     },
 
     start: function (k) {
@@ -1091,7 +937,7 @@ function draw_keeper_ok(k) {
     let pos = sprite_pos(k)
     let sp = pos.y < 0 && 57 || 54;
     jersey_color(k);
-    spr(sp, pos.x, pos.y);
+    Renderer.spr(sp, pos.x, pos.y);
 }
 
 
@@ -1317,11 +1163,8 @@ let game_state_ballin = {
 }
 
 function _init() {
-    canvas = <HTMLCanvasElement>document.getElementById("canvas");
-    canvas.width = 128;
-    canvas.height = 128;
-    context = canvas.getContext('2d');
-    context.msImageSmoothingEnabled = false;
+    Renderer.init();
+
 
     music(0, 0, 6)
     create_player(0)
@@ -1410,7 +1253,7 @@ function fs_throwin_draw(f) {
     jersey_color(f)
     let pos = sprite_pos(f)
     f.lastflip = f.x > 0
-    spr(48 + f.lastspr, pos.x, pos.y, 1, 1, f.lastflip)
+    Renderer.spr(48 + f.lastspr, pos.x, pos.y, 1, 1, f.lastflip)
     ball.x = f.x
     ball.y = f.y
     ball.z = 7
@@ -1617,7 +1460,7 @@ let fstate_down = {
         let down_spr = 37
         let pos = sprite_pos(f)
         jersey_color(f)
-        spr(down_spr + f.lastspr, pos.x, pos.y, 1, 1, f.lastflip)
+        Renderer.spr(down_spr + f.lastspr, pos.x, pos.y, 1, 1, f.lastflip)
     },
 
     update: function (f) {
@@ -1638,7 +1481,7 @@ let fstate_tackle = {
     draw: function (f) {
         let pos = sprite_pos(f)
         jersey_color(f)
-        spr(32 + f.lastspr, pos.x, pos.y, 1, 1, f.lastflip)
+        Renderer.spr(32 + f.lastspr, pos.x, pos.y, 1, 1, f.lastflip)
     },
 
     update: function (f) {
@@ -1761,27 +1604,27 @@ function changeshirt(i) {
 
 
 function _draw() {
-    camera()
-    rectfill(0, 0, 127, 127, 3)
+    Renderer.camera()
+    Renderer.rectfill(0, 0, 127, 127, 3)
 
-    camera(camtarget.x - 64, camtarget.y - 64)
+    Renderer.camera(camtarget.x - 64, camtarget.y - 64)
 
     for (let y = -fh2; y <= fh2 - 1; y += 32) {
-        rectfill(-fw2, y, fw2, y + 16, 3)
-        rectfill(-fw2, y + 16, fw2, y + 32, 11)
+        Renderer.rectfill(-fw2, y, fw2, y + 16, 3)
+        Renderer.rectfill(-fw2, y + 16, fw2, y + 32, 11)
     }
 
-    color(7)
-    rect(-fw2, -fh2, fw2, fh2)
-    line(-fw2, 0, fw2, 0)
+    Renderer.color(7)
+    Renderer.rect(-fw2, -fh2, fw2, fh2)
+    Renderer.line(-fw2, 0, fw2, 0)
 
-    rect(-penaltyw2, -fh2, penaltyw2, -fh2_penaltyh)
-    rect(-penaltyw2, fh2, penaltyw2, fh2_penaltyh)
+    Renderer.rect(-penaltyw2, -fh2, penaltyw2, -fh2_penaltyh)
+    Renderer.rect(-penaltyw2, fh2, penaltyw2, fh2_penaltyh)
 
     circ(0, 0, 30)
 
-    palt(3, true)
-    palt(0, false)
+    Renderer.palt(3, true)
+    Renderer.palt(0, false)
 
     let draw_list = [];//{}
     //add(draw_list, goal_up)
@@ -1812,36 +1655,36 @@ function _draw() {
     //-- end
 
     pal()
-    palt()
-    camera()
+    Renderer.palt()
+    Renderer.camera()
 
-    if (scoring_team != 0) print_outlined("goal!", 55, 6, 7, 0)
-    if (matchtimer > full_time) print_outlined("game over", 47, 16, 7, 0)
-    if (changing_side) print_outlined("half time", 47, 16, 7, 0)
+    if (scoring_team != 0) Renderer.print_outlined("goal!", 55, 6, 7, 0)
+    if (matchtimer > full_time) Renderer.print_outlined("game over", 47, 16, 7, 0)
+    if (changing_side) Renderer.print_outlined("half time", 47, 16, 7, 0)
 
-    print_outlined(score[1], 116, 1, 12, 0)
-    print_outlined("-", 120, 1, 7, 0)
-    print_outlined(score[2], 124, 1, 8, 0)
+    Renderer.print_outlined(score[1], 116, 1, 12, 0)
+    Renderer.print_outlined("-", 120, 1, 7, 0)
+    Renderer.print_outlined(score[2], 124, 1, 8, 0)
     if (demo) {
         menu_offset = Math.max(menu_offset / 2, 1)
     } else {
         menu_offset = Math.min(menu_offset * 2, 128)
-        print_outlined(Math.floor(matchtimer / 30), 1, 122, 7, 0)
+        Renderer.print_outlined(Math.floor(matchtimer / 30), 1, 122, 7, 0)
     }
-    print_outlined("succer", 51 + menu_offset, 40, 7, 0)
+    Renderer.print_outlined("succer", 51 + menu_offset, 40, 7, 0)
     print_mode(0, "player vs player")
     print_mode(1, "player vs cpu")
     print_mode(2, "   cpu vs cpu")
     draw_button(0, 20, 74)
     draw_button(1, 100, 74)
-    print_outlined("team colors", 42 + menu_offset, 90, 6, 5)
+    Renderer.print_outlined("team colors", 42 + menu_offset, 90, 6, 5)
     draw_button(2, 20, 89)
     draw_button(3, 100, 89)
     if (blink)
-        print_outlined("press z to start", 32 - menu_offset, 110, 6, 5)
+        Renderer.print_outlined("press z to start", 32 - menu_offset, 110, 6, 5)
 }
 
 
 function draw_button(s, x, y) {
-    spr(64 + s, x - menu_offset, y + (btnp(s) && 1 || 0))
+    Renderer.spr(64 + s, x - menu_offset, y + (btnp(s) && 1 || 0))
 }

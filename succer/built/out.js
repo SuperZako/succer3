@@ -1,20 +1,132 @@
-var canvas;
-var context;
-function _print(_str, _x, _y, _col) {
-}
-/* Imageオブジェクトを生成 */
-var img = new Image();
-img.src = "../img/sprite2.png";
-function spr(n, x, y, _w, _h, _flip_x, _flip_y) {
-    if (_w === void 0) { _w = 0; }
-    if (_h === void 0) { _h = 0; }
-    if (_flip_x === void 0) { _flip_x = false; }
-    if (_flip_y === void 0) { _flip_y = false; }
-    n = Math.round(n);
-    var col = n % 16;
-    var row = Math.floor(n / 16);
-    context.drawImage(img, col * 8, row * 8, 8, 8, x - offsetX, y - offsetY, 8, 8);
-}
+var Renderer;
+(function (Renderer) {
+    var canvas;
+    var context;
+    /* Imageオブジェクトを生成 */
+    var img = new Image();
+    img.src = "../img/sprite2.png";
+    var offsetX = 0;
+    var offsetY = 0;
+    function init() {
+        canvas = document.getElementById("canvas");
+        canvas.width = 128;
+        canvas.height = 128;
+        context = canvas.getContext('2d');
+        context.msImageSmoothingEnabled = false;
+    }
+    Renderer.init = init;
+    function camera(x, y) {
+        if (x === void 0) { x = 0; }
+        if (y === void 0) { y = 0; }
+        offsetX = x;
+        offsetY = y;
+    }
+    Renderer.camera = camera;
+    function print(_str, _x, _y, _col) {
+    }
+    Renderer.print = print;
+    function print_outlined(t, x, y, c, oc) {
+        for (var i = x - 1; i < x + 1; ++i) {
+            for (var j = y - 1; j < y + 1; ++j) {
+                print(t, i, j, oc);
+            }
+        }
+        print(t, x, y, c);
+    }
+    Renderer.print_outlined = print_outlined;
+    function spr(n, x, y, _w, _h, _flip_x, _flip_y) {
+        if (_w === void 0) { _w = 0; }
+        if (_h === void 0) { _h = 0; }
+        if (_flip_x === void 0) { _flip_x = false; }
+        if (_flip_y === void 0) { _flip_y = false; }
+        n = Math.round(n);
+        var col = n % 16;
+        var row = Math.floor(n / 16);
+        context.drawImage(img, col * 8, row * 8, 8, 8, x - offsetX, y - offsetY, 8, 8);
+    }
+    Renderer.spr = spr;
+    function palt(_col, _t) {
+        if (_col === void 0) { _col = 0; }
+        if (_t === void 0) { _t = false; }
+    }
+    Renderer.palt = palt;
+    function line(x0, y0, x1, y1, _col) {
+        if (_col === void 0) { _col = 0; }
+        x0 -= offsetX;
+        x1 -= offsetX;
+        y0 -= offsetY;
+        y1 -= offsetY;
+        if (context) {
+            context.save();
+            //新しいパスを開始する
+            context.beginPath();
+            //パスの開始座標を指定する
+            context.moveTo(x0, y0);
+            //座標を指定してラインを引いていく
+            context.lineTo(x1, y1);
+            //パスを閉じる（最後の座標から開始座標に向けてラインを引く）
+            context.closePath();
+            //現在のパスを輪郭表示する
+            context.stroke();
+            context.restore();
+        }
+    }
+    Renderer.line = line;
+    function rect(x0, y0, x1, y1, _col) {
+        if (x0 === void 0) { x0 = 0; }
+        if (y0 === void 0) { y0 = 0; }
+        if (x1 === void 0) { x1 = 0; }
+        if (y1 === void 0) { y1 = 0; }
+        if (_col === void 0) { _col = 0; }
+        x0 -= offsetX;
+        x1 -= offsetX;
+        y0 -= offsetY;
+        y1 -= offsetY;
+        if (context) {
+            context.save();
+            context.strokeRect(x0, y0, x1 - x0, y1 - y0);
+            context.restore();
+        }
+    }
+    Renderer.rect = rect;
+    function rectfill(x0, y0, x1, y1, col) {
+        if (x0 === void 0) { x0 = 0; }
+        if (y0 === void 0) { y0 = 0; }
+        if (x1 === void 0) { x1 = 0; }
+        if (y1 === void 0) { y1 = 0; }
+        x0 -= offsetX;
+        x1 -= offsetX;
+        y0 -= offsetY;
+        y1 -= offsetY;
+        if (context) {
+            context.save();
+            switch (col) {
+                case 3:
+                    context.fillStyle = 'green';
+                    break;
+                case 4:
+                    context.fillStyle = 'red';
+                    break;
+                case 6:
+                    context.fillStyle = "gray";
+                    break;
+                case 7:
+                    context.fillStyle = 'white';
+                    break;
+                default:
+                    break;
+            }
+            context.fillRect(x0, y0, x1 - x0, y1 - y0);
+            context.restore();
+        }
+    }
+    Renderer.rectfill = rectfill;
+    function color(_col) {
+        if (_col === void 0) { _col = 0; }
+    }
+    Renderer.color = color;
+})(Renderer || (Renderer = {}));
+/// <reference path="Renderer.ts" />
 function rnd(n) {
     return Math.random() * n;
 }
@@ -36,89 +148,6 @@ function pal(_c0, _c1, _p) {
     if (_c0 === void 0) { _c0 = 0; }
     if (_c1 === void 0) { _c1 = 0; }
     if (_p === void 0) { _p = 0; }
-}
-var offsetX = 0;
-var offsetY = 0;
-function camera(x, y) {
-    if (x === void 0) { x = 0; }
-    if (y === void 0) { y = 0; }
-    offsetX = x;
-    offsetY = y;
-}
-function palt(_col, _t) {
-    if (_col === void 0) { _col = 0; }
-    if (_t === void 0) { _t = false; }
-}
-function line(x0, y0, x1, y1, _col) {
-    if (_col === void 0) { _col = 0; }
-    x0 -= offsetX;
-    x1 -= offsetX;
-    y0 -= offsetY;
-    y1 -= offsetY;
-    if (context) {
-        context.save();
-        //新しいパスを開始する
-        context.beginPath();
-        //パスの開始座標を指定する
-        context.moveTo(x0, y0);
-        //座標を指定してラインを引いていく
-        context.lineTo(x1, y1);
-        //パスを閉じる（最後の座標から開始座標に向けてラインを引く）
-        context.closePath();
-        //現在のパスを輪郭表示する
-        context.stroke();
-        context.restore();
-    }
-}
-function rect(x0, y0, x1, y1, _col) {
-    if (x0 === void 0) { x0 = 0; }
-    if (y0 === void 0) { y0 = 0; }
-    if (x1 === void 0) { x1 = 0; }
-    if (y1 === void 0) { y1 = 0; }
-    if (_col === void 0) { _col = 0; }
-    x0 -= offsetX;
-    x1 -= offsetX;
-    y0 -= offsetY;
-    y1 -= offsetY;
-    if (context) {
-        context.save();
-        context.strokeRect(x0, y0, x1 - x0, y1 - y0);
-        context.restore();
-    }
-}
-function rectfill(x0, y0, x1, y1, col) {
-    if (x0 === void 0) { x0 = 0; }
-    if (y0 === void 0) { y0 = 0; }
-    if (x1 === void 0) { x1 = 0; }
-    if (y1 === void 0) { y1 = 0; }
-    x0 -= offsetX;
-    x1 -= offsetX;
-    y0 -= offsetY;
-    y1 -= offsetY;
-    if (context) {
-        context.save();
-        switch (col) {
-            case 3:
-                context.fillStyle = 'green';
-                break;
-            case 4:
-                context.fillStyle = 'red';
-                break;
-            case 6:
-                context.fillStyle = "gray";
-                break;
-            case 7:
-                context.fillStyle = 'white';
-                break;
-            default:
-                break;
-        }
-        context.fillRect(x0, y0, x1 - x0, y1 - y0);
-        context.restore();
-    }
-}
-function color(_col) {
-    if (_col === void 0) { _col = 0; }
 }
 function circ(_x, _y, _r, _col) {
     if (_x === void 0) { _x = 0; }
@@ -203,14 +232,6 @@ var throwintype;
 var throwinside;
 var changing_side;
 var man_with_ball;
-function print_outlined(t, x, y, c, oc) {
-    for (var i = x - 1; i < x + 1; ++i) {
-        for (var j = y - 1; j < y + 1; ++j) {
-            _print(t, i, j, oc);
-        }
-    }
-    _print(t, x, y, c);
-}
 function dist_manh(a, b) {
     return Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
 }
@@ -220,7 +241,7 @@ function draw_marker(f) {
         sp = 30;
     if (f.hasball)
         sp = 31;
-    spr(sp, f.x - 4, f.y - 6);
+    Renderer.spr(sp, f.x - 4, f.y - 6);
 }
 function jersey_color(f) {
     var shirt = shirtcolors[teamcolors[f.teamcolors]];
@@ -288,7 +309,7 @@ function draw_footballer(f) {
         f.animtimer -= anim_end;
     }
     var pos = sprite_pos(f);
-    spr(animoffset + f.lastspr * animfactor + f.animtimer, pos.x, pos.y, 1, 1, f.lastflip);
+    Renderer.spr(animoffset + f.lastspr * animfactor + f.animtimer, pos.x, pos.y, 1, 1, f.lastflip);
 }
 function sprite_pos(f) {
     return { x: f.x - f.w, y: f.y - f.h };
@@ -323,7 +344,7 @@ function create_footballer(p, i) {
             fo.state.update(fo);
         },
         drawshadow: function (t) {
-            spr(46, t.x - 2, t.y - 2);
+            Renderer.spr(46, t.x - 2, t.y - 2);
         },
         state: fstate_ok,
         set_state: function (fo, st) {
@@ -345,10 +366,10 @@ var ball = {
     // -- damp=0.95,
     dampair: 0.985,
     draw: function (b) {
-        spr(44, b.x - b.w, b.y - b.h - b.z);
+        Renderer.spr(44, b.x - b.w, b.y - b.h - b.z);
     },
     drawshadow: function (b) {
-        spr(45, b.x - b.w + 1, b.y - b.h + 1);
+        Renderer.spr(45, b.x - b.w + 1, b.y - b.h + 1);
     }
 };
 var balllasttouchedside = 0;
@@ -725,37 +746,37 @@ var goal_up = {
         var clipstarty = -camtarget.y + 64 - fh2;
         var clipendx = goalx2 - goalx1;
         var clipendy = goalh / 2 + 1;
-        spr(60, goalx2, -fh2 - 17);
+        Renderer.spr(60, goalx2, -fh2 - 17);
         clip(clipstartx, clipstarty - 10, clipendx + 8, clipendy);
         for (var x = goalx1 - 1; x < goalx2 + 8; x += 8) {
             for (var y = -11; y < 7; y += 8) {
-                spr(61, x, y - fh2);
+                Renderer.spr(61, x, y - fh2);
             }
         }
         clip(clipstartx, clipstarty - goalh, clipendx - 1, clipendy);
         for (var x = goalx1 - 1; x < goalx2 + 8; x += 8) {
             for (var y = -goalh + 1; y < 8; y += 8) {
-                spr(62, x, y - fh2);
+                Renderer.spr(62, x, y - fh2);
             }
         }
         clip();
         var a = -goall - fh2;
-        line(goalx1, a, goalx1, -fh2);
-        line(goalx1, a, goalx2, a);
-        line(goalx2, a, goalx2, -fh2);
+        Renderer.line(goalx1, a, goalx1, -fh2);
+        Renderer.line(goalx1, a, goalx2, a);
+        Renderer.line(goalx2, a, goalx2, -fh2);
     },
     drawshadow: nothing
 };
 var goal_down = {
     y: fh2 + goalh,
     draw: function () {
-        spr(60, goalx2, fh2, 1, 1, false, true);
-        color(7);
-        rect(goalx1, -goall + fh2, goalx2, fh2);
+        Renderer.spr(60, goalx2, fh2, 1, 1, false, true);
+        Renderer.color(7);
+        Renderer.rect(goalx1, -goall + fh2, goalx2, fh2);
         clip(goalx1 - camtarget.x + 64 + 1, -goall - camtarget.y + 64 + fh2 + 1, goalx2 - goalx1 - 1, goalh - 1);
         for (var x = goalx1; x <= goalx2 + 7; x += 8) {
             for (var y = -goall; y <= goall; y += 8) {
-                spr(62, x, y + fh2);
+                Renderer.spr(62, x, y + fh2);
             }
         }
         clip();
@@ -858,7 +879,7 @@ function start_match(dem) {
 }
 function print_mode(m, t) {
     if (m == mode)
-        print_outlined(t, 32 - menu_offset, 75, 6, 5);
+        Renderer.print_outlined(t, 32 - menu_offset, 75, 6, 5);
 }
 function change_side(f) {
     f.side = -f.side;
@@ -875,7 +896,7 @@ var keeper_state_dive = {
     draw: function (k) {
         jersey_color(k);
         var pos = sprite_pos(k);
-        spr(k.lastspr, pos.x, pos.y, 1, 1, k.d.x < 0);
+        Renderer.spr(k.lastspr, pos.x, pos.y, 1, 1, k.d.x < 0);
     },
     start: function (k) {
         k.timer = 30;
@@ -899,7 +920,7 @@ function draw_keeper_ok(k) {
     var pos = sprite_pos(k);
     var sp = pos.y < 0 && 57 || 54;
     jersey_color(k);
-    spr(sp, pos.x, pos.y);
+    Renderer.spr(sp, pos.x, pos.y);
 }
 var keeper_state_ok = {
     ai: undefined,
@@ -1094,11 +1115,7 @@ var game_state_ballin = {
     },
 };
 function _init() {
-    canvas = document.getElementById("canvas");
-    canvas.width = 128;
-    canvas.height = 128;
-    context = canvas.getContext('2d');
-    context.msImageSmoothingEnabled = false;
+    Renderer.init();
     music(0, 0, 6);
     create_player(0);
     create_player(1);
@@ -1179,7 +1196,7 @@ function fs_throwin_draw(f) {
     jersey_color(f);
     var pos = sprite_pos(f);
     f.lastflip = f.x > 0;
-    spr(48 + f.lastspr, pos.x, pos.y, 1, 1, f.lastflip);
+    Renderer.spr(48 + f.lastspr, pos.x, pos.y, 1, 1, f.lastflip);
     ball.x = f.x;
     ball.y = f.y;
     ball.z = 7;
@@ -1369,7 +1386,7 @@ var fstate_down = {
         var down_spr = 37;
         var pos = sprite_pos(f);
         jersey_color(f);
-        spr(down_spr + f.lastspr, pos.x, pos.y, 1, 1, f.lastflip);
+        Renderer.spr(down_spr + f.lastspr, pos.x, pos.y, 1, 1, f.lastflip);
     },
     update: function (f) {
         if (checktimer(f)) {
@@ -1388,7 +1405,7 @@ var fstate_tackle = {
     draw: function (f) {
         var pos = sprite_pos(f);
         jersey_color(f);
-        spr(32 + f.lastspr, pos.x, pos.y, 1, 1, f.lastflip);
+        Renderer.spr(32 + f.lastspr, pos.x, pos.y, 1, 1, f.lastflip);
     },
     update: function (f) {
         if (checktimer(f)) {
@@ -1505,21 +1522,21 @@ function changeshirt(i) {
         teamcolors[i] += 1;
 }
 function _draw() {
-    camera();
-    rectfill(0, 0, 127, 127, 3);
-    camera(camtarget.x - 64, camtarget.y - 64);
+    Renderer.camera();
+    Renderer.rectfill(0, 0, 127, 127, 3);
+    Renderer.camera(camtarget.x - 64, camtarget.y - 64);
     for (var y = -fh2; y <= fh2 - 1; y += 32) {
-        rectfill(-fw2, y, fw2, y + 16, 3);
-        rectfill(-fw2, y + 16, fw2, y + 32, 11);
+        Renderer.rectfill(-fw2, y, fw2, y + 16, 3);
+        Renderer.rectfill(-fw2, y + 16, fw2, y + 32, 11);
     }
-    color(7);
-    rect(-fw2, -fh2, fw2, fh2);
-    line(-fw2, 0, fw2, 0);
-    rect(-penaltyw2, -fh2, penaltyw2, -fh2_penaltyh);
-    rect(-penaltyw2, fh2, penaltyw2, fh2_penaltyh);
+    Renderer.color(7);
+    Renderer.rect(-fw2, -fh2, fw2, fh2);
+    Renderer.line(-fw2, 0, fw2, 0);
+    Renderer.rect(-penaltyw2, -fh2, penaltyw2, -fh2_penaltyh);
+    Renderer.rect(-penaltyw2, fh2, penaltyw2, fh2_penaltyh);
     circ(0, 0, 30);
-    palt(3, true);
-    palt(0, false);
+    Renderer.palt(3, true);
+    Renderer.palt(0, false);
     var draw_list = []; //{}
     //add(draw_list, goal_up)
     draw_list.push(goal_up);
@@ -1547,38 +1564,38 @@ function _draw() {
     //    --line(i.x, i.y, i.x + 10 * i.dir.x, i.y + 10 * i.dir.y, 10)
     //-- end
     pal();
-    palt();
-    camera();
+    Renderer.palt();
+    Renderer.camera();
     if (scoring_team != 0)
-        print_outlined("goal!", 55, 6, 7, 0);
+        Renderer.print_outlined("goal!", 55, 6, 7, 0);
     if (matchtimer > full_time)
-        print_outlined("game over", 47, 16, 7, 0);
+        Renderer.print_outlined("game over", 47, 16, 7, 0);
     if (changing_side)
-        print_outlined("half time", 47, 16, 7, 0);
-    print_outlined(score[1], 116, 1, 12, 0);
-    print_outlined("-", 120, 1, 7, 0);
-    print_outlined(score[2], 124, 1, 8, 0);
+        Renderer.print_outlined("half time", 47, 16, 7, 0);
+    Renderer.print_outlined(score[1], 116, 1, 12, 0);
+    Renderer.print_outlined("-", 120, 1, 7, 0);
+    Renderer.print_outlined(score[2], 124, 1, 8, 0);
     if (demo) {
         menu_offset = Math.max(menu_offset / 2, 1);
     }
     else {
         menu_offset = Math.min(menu_offset * 2, 128);
-        print_outlined(Math.floor(matchtimer / 30), 1, 122, 7, 0);
+        Renderer.print_outlined(Math.floor(matchtimer / 30), 1, 122, 7, 0);
     }
-    print_outlined("succer", 51 + menu_offset, 40, 7, 0);
+    Renderer.print_outlined("succer", 51 + menu_offset, 40, 7, 0);
     print_mode(0, "player vs player");
     print_mode(1, "player vs cpu");
     print_mode(2, "   cpu vs cpu");
     draw_button(0, 20, 74);
     draw_button(1, 100, 74);
-    print_outlined("team colors", 42 + menu_offset, 90, 6, 5);
+    Renderer.print_outlined("team colors", 42 + menu_offset, 90, 6, 5);
     draw_button(2, 20, 89);
     draw_button(3, 100, 89);
     if (blink)
-        print_outlined("press z to start", 32 - menu_offset, 110, 6, 5);
+        Renderer.print_outlined("press z to start", 32 - menu_offset, 110, 6, 5);
 }
 function draw_button(s, x, y) {
-    spr(64 + s, x - menu_offset, y + (btnp(s) && 1 || 0));
+    Renderer.spr(64 + s, x - menu_offset, y + (btnp(s) && 1 || 0));
 }
 /// <reference path="./main.ts" />
 var cnt = 0;
